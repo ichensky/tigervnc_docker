@@ -1,0 +1,68 @@
+diff -ru tmp1/vncviewer/DesktopWindow.cxx tmp/vncviewer/DesktopWindow.cxx
+--- tmp1/vncviewer/DesktopWindow.cxx	2018-07-16 10:08:55.000000000 -0400
++++ tmp/vncviewer/DesktopWindow.cxx	2019-11-14 04:00:19.820217704 -0500
+@@ -71,6 +71,7 @@
+ {
+   Fl_Group* group;
+ 
++  grab_keyboard_state = 0;
+   // Dummy group to prevent FLTK from moving our widgets around
+   group = new Fl_Group(0, 0, w, h);
+   group->resizable(NULL);
+diff -ru tmp1/vncviewer/DesktopWindow.h tmp/vncviewer/DesktopWindow.h
+--- tmp1/vncviewer/DesktopWindow.h	2018-07-16 10:08:55.000000000 -0400
++++ tmp/vncviewer/DesktopWindow.h	2019-11-14 04:03:28.685263131 -0500
+@@ -79,6 +79,10 @@
+   int handle(int event);
+ 
+   void fullscreen_on();
++  
++  int grab_keyboard_state;
++  void grabKeyboard();
++  void ungrabKeyboard();
+ 
+ private:
+   static void menuOverlay(void *data);
+@@ -88,8 +92,6 @@
+ 
+   static int fltkHandle(int event, Fl_Window *win);
+ 
+-  void grabKeyboard();
+-  void ungrabKeyboard();
+   void grabPointer();
+   void ungrabPointer();
+ 
+diff -ru tmp1/vncviewer/Viewport.cxx tmp/vncviewer/Viewport.cxx
+--- tmp1/vncviewer/Viewport.cxx	2019-11-14 03:52:36.000000000 -0500
++++ tmp/vncviewer/Viewport.cxx	2019-11-14 04:08:06.590181406 -0500
+@@ -800,6 +800,7 @@
+ void Viewport::handleKeyPress(int keyCode, rdr::U32 keySym)
+ {
+   static bool menuRecursion = false;
++  DesktopWindow *dw = dynamic_cast<DesktopWindow*>(window());
+ 
+   // Prevent recursion if the menu wants to send its own
+   // activation key.
+@@ -857,8 +858,21 @@
+     // Fake keycode?
+     if (keyCode > 0xff)
+       cc->writer()->writeKeyEvent(keySym, 0, true);
+-    else
++    else{
++      // Code to use Control_R as a grabKeyboard shortcut, as in remmina
++      if (keySym == FL_Control_R ) {
++        if(dw->grab_keyboard_state == 0) {
++          dw->grab_keyboard_state = 1;
++          dw->grabKeyboard();
++        }
++        else  {
++          dw->grab_keyboard_state = 0;
++          dw->fullscreen_off();
++          dw->ungrabKeyboard();
++        }
++      }
+       cc->writer()->writeKeyEvent(keySym, keyCode, true);
++    }
+   } catch (rdr::Exception& e) {
+     vlog.error("%s", e.str());
+     exit_vncviewer(e.str());
