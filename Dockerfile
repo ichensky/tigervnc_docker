@@ -1,7 +1,6 @@
 from debian:buster
 
-env username=bob
-run username=$(< /dev/urandom tr -dc a-z | head -c10)
+arg username=john
 run cat /etc/apt/sources.list | grep "^deb " | sed 's/^deb /deb-src /' >> /etc/apt/sources.list
 run apt-get update
 run apt-get build-dep -y tigervnc-viewer
