@@ -1,6 +1,6 @@
 # tigervnc_docker
 Contains docker file that build `debian` package with
-`tigervnc`, that contains patch , 
+`tigervnc`, that contains patch (https://github.com/TigerVNC/tigervnc/issues/2), 
 which add ability for VNC client grab system keys via Ctrl_R
 
 ## How to use it
