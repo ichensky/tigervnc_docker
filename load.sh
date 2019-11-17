@@ -1,1 +1,1 @@
-docker pull ichensky/tigervnc:ctrl_r
+sudo docker pull ichensky/tigervnc:ctrl_r
