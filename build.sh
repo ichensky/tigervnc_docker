@@ -1,1 +1,1 @@
-docker build -t ichensky/tigervnc:ctrl_r .
+sudo docker build -t ichensky/tigervnc:ctrl_r .
